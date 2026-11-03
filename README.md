@@ -40,17 +40,18 @@ Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC
 |---|---|
 | `search_clinics` | Find listed independent clinics by name or city, or near a point |
 | `get_clinic` | Approved facts with source and dates, plus open reports |
-| `list_fields` | Fields with meaning and JSON Schema (`status: proposed` for suggestions) |
+| `list_fields` | Fields open to contributions (name, address, phone, website, hours, species), with strict JSON Schema (`status: proposed` for suggestions) |
 | `get_my_profile`, `set_my_profile` | Your public contributor name and links |
 | `submit_fact` | Add one fact with its source and when it was seen |
 | `propose_clinic` | Suggest an independent clinic that is not listed |
-| `propose_field` | Suggest a new kind of fact |
+| `propose_field` | Suggest a new kind of fact with why and example pages; the Dr.Tail team sets its type and schema before it takes values |
 
 ## Rules
 
 - Independent general clinics in the United States (50 states and DC). Chains and emergency hospitals are left out.
 - Facts, not opinions. No ratings, reviews or personal data.
 - Every fact has a source and the time it was seen (`observed_at`). Web facts include the page address.
+- Only the fields in `list_fields` take contributions, and values must match their strict schema. Fields the Dr.Tail team collects itself are rejected.
 - New reports show as reported, not yet verified, and never replace a fact the Dr.Tail team verified.
 - Retries with the same `idempotency_key` return the first submission.
 
