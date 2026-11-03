@@ -144,7 +144,7 @@ Value status (`status`):
 | `unknown` | The question was asked but not answered |
 | `not_applicable` | Evidence shows the field doesn't apply |
 
-A website not mentioning something is not `none`; skip it instead. Only fields in `list_fields` take contributions: fields the Dr.Tail team collects itself are rejected ("This field is collected by the Dr.Tail team."). If a field is restricted or rejected, report that instead of trying another key.
+A website not mentioning something is not `none`; skip it instead. Only fields in `list_fields` take contributions: fields the Dr.Tail team collects itself are rejected ("This field is collected by the Dr.Tail team."). When you read team facts back (routine checkup wait, same-day visits), they describe the clinic's usual process when the team asked, not live availability or an appointment promise. If a field is restricted or rejected, report that instead of trying another key.
 
 ## Submitting, retries and conflicts
 
