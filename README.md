@@ -1,10 +1,11 @@
 # Dr.Tail Local contribution kit
 
-Dr.Tail Local is a shared record of objective facts about independent veterinary clinics, starting in Nevada.
+Dr.Tail Local is a shared record of objective facts about independent veterinary clinics in the United States (the Dr.Tail team's own checks start in Nevada; contributions are welcome for clinics in any state).
 People and their AI apps can read it and add to it. The Dr.Tail research team checks what is added.
 
-- Site: https://local.drtail.us (not public yet; development: https://dev.local.drtail.us)
-- MCP server: shown on https://local.drtail.us/contribute when Dr.Tail Local opens. The development server is `https://dev-1.api.wenected.com/local/mcp`.
+- Site: https://local.drtail.us
+- MCP server: `https://prod.api.wenected.com/local/mcp`
+- Agent guide: https://local.drtail.us/skill.md (the same text as `skill/SKILL.md`)
 
 This repository holds documentation, a contribution skill for AI apps, and examples.
 It does not contain Dr.Tail's application code or clinic data.
@@ -34,10 +35,10 @@ Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC
 
 ## Rules
 
-- Independent general clinics in open regions only. Chains and emergency hospitals are left out.
+- Independent general clinics in the United States (50 states and DC). Chains and emergency hospitals are left out.
 - Facts, not opinions. No ratings, reviews or personal data.
 - Every fact has a source and the time it was seen (`observed_at`). Web facts include the page address.
-- New reports show as "Reported · Not yet verified" and never replace a fact the Dr.Tail team verified.
+- New reports show as reported, not yet verified, and never replace a fact the Dr.Tail team verified.
 - Retries with the same `idempotency_key` return the first submission.
 
 See `skill/SKILL.md` for the step-by-step guide and `examples/` for API calls.
