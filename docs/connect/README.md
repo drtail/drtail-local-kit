@@ -1,6 +1,8 @@
 # Connect Dr.Tail Local to your AI
 
-Choose the app you are using. Reading the contribution skill does not install a connection. Setup is usually needed once per app or environment. Sign in through Dr.Tail's normal authorization page; never paste an access token into a chat.
+**Using an AI that can run commands (Claude Code, Codex, Cursor)?** You can skip setup: ask it to read https://local.drtail.us/skill.md and help you contribute one fact. It uses device login: it opens a Dr.Tail page with a code, you sign in and press Allow, and it continues on its own.
+
+Otherwise, choose the app you are using. Reading the contribution skill does not install a connection. Setup is usually needed once per app or environment. Sign in through Dr.Tail's normal authorization page; never paste an access token into a chat.
 
 | App | Guide | Dr.Tail compatibility status |
 |---|---|---|

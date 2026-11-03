@@ -2,6 +2,10 @@
 
 > **Setup guide — not yet verified end to end.** These steps follow the client's documentation. Nobody has yet run Dr.Tail sign-in, a read tool and a write in this environment and recorded the result. Report what happens in an issue (no tokens or codes).
 
+**Simplest: device login.** Ask Claude Code: "Read https://local.drtail.us/skill.md and help me contribute one useful fact to Dr.Tail Local." It starts a device login, opens a Dr.Tail page with a short code, and continues after you sign in and press Allow. Nothing to add with `claude mcp`, no restart. Tokens are kept in `~/.config/drtail-local/credentials.json` (mode 600) and reused next time.
+
+The steps below add Dr.Tail Local as an MCP server instead, if you prefer Claude Code's own MCP tools.
+
 1. Check whether `drtail-local` is already registered with `claude mcp list` or `/mcp`. Reuse a matching connection. If a connection with that name points elsewhere, inspect it before changing it.
 2. For a personal connection available across your projects on this machine, add:
 

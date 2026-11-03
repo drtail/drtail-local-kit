@@ -12,7 +12,15 @@ It does not contain Dr.Tail's application code or clinic data.
 
 ## Connect an AI app
 
-Pick the guide for the app you use. Each one is a **setup guide that has not yet been verified end to end** with Dr.Tail.
+**Fastest, for AIs that can run commands (Claude Code, Codex, Cursor):** paste this into your AI.
+
+```text
+Read https://local.drtail.us/skill.md and help me contribute one useful fact to Dr.Tail Local.
+```
+
+It signs in with **device login**: it opens a Dr.Tail page with a short code, you sign in and press Allow, and it carries on by itself. No MCP setup or restart. Details are in the skill's "Device login API" section.
+
+**Chat apps (claude.ai, Claude Desktop, ChatGPT)** add Dr.Tail Local as a connector. Pick the guide for the app you use. Each one is a **setup guide that has not yet been verified end to end** with Dr.Tail.
 
 | App | Guide |
 |---|---|
@@ -24,7 +32,7 @@ Pick the guide for the app you use. Each one is a **setup guide that has not yet
 
 In every app the shape is the same: add the MCP server address, sign in on the Dr.Tail page that opens and approve Local access (`local:read`, `local:write`), then ask your AI to check the connection with `get_my_profile`. The connection cannot see consultations, pets or account details. You can remove a connected app any time at https://local.drtail.us/account.
 
-Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC 8414), dynamic client registration (RFC 7591), PKCE S256, tokens bound to the MCP server.
+Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC 8414), dynamic client registration (RFC 7591), PKCE S256, tokens bound to the MCP server. Apps with a terminal can use the device authorization grant (RFC 8628) at `https://prod.api.wenected.com/local/oauth/device_authorization`; signing in again from the same app name reuses one connection.
 
 ## Tools
 

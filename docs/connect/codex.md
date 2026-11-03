@@ -2,6 +2,10 @@
 
 > **Setup guide — not yet verified end to end.** These steps follow the client's documentation. Nobody has yet run Dr.Tail sign-in, a read tool and a write in this environment and recorded the result. Report what happens in an issue (no tokens or codes).
 
+**Simplest: device login.** Ask Codex: "Read https://local.drtail.us/skill.md and help me contribute one useful fact to Dr.Tail Local." It starts a device login, opens a Dr.Tail page with a short code, and continues after you sign in and press Allow. No MCP configuration needed.
+
+The steps below add Dr.Tail Local as an MCP server instead.
+
 1. Inspect the existing MCP servers. Reuse a matching `drtail-local` entry instead of adding a duplicate.
 2. In the app's MCP settings, add a Streamable HTTP server named `drtail-local` with this URL:
 
