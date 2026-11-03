@@ -216,7 +216,7 @@ Save as `~/.config/drtail-local/dtl.py`. Python 3 standard library only.
 # Dr.Tail Local helper 0.3.0 - device login and MCP tool calls.
 # Usage: dtl.py login "App name" | wait | tools | call TOOL '{"arg": "value"}'
 # Tokens stay in ~/.config/drtail-local/credentials.json (mode 600) and go only to API.
-import json, os, sys, time, urllib.error, urllib.request, webbrowser
+import json, os, subprocess, sys, time, urllib.error, urllib.request
 
 API = 'https://prod.api.wenected.com'
 DIR = os.path.expanduser('~/.config/drtail-local')
@@ -245,7 +245,8 @@ def post(path, data, token=None):
 def save(path, data):
     os.makedirs(DIR, mode=0o700, exist_ok=True)
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    os.fchmod(fd, 0o600)
+    if hasattr(os, 'fchmod'):
+        os.fchmod(fd, 0o600)  # also tighten a file that already existed
     with os.fdopen(fd, 'w') as f:
         json.dump(data, f)
 
@@ -261,12 +262,29 @@ def keep(tokens, client_id, old_refresh=None):
                 'expires_at': time.time() + tokens['expires_in'] - 60})
 
 
+def open_browser(url):
+    # open / start / xdg-open; never a text browser, never wait on it
+    if sys.platform.startswith('win'):
+        os.startfile(url)
+        return True
+    if sys.platform == 'darwin':
+        cmd = ['open', url]
+    elif os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY'):
+        cmd = ['xdg-open', url]
+    else:
+        return False
+    try:
+        return subprocess.run(cmd, timeout=10, capture_output=True).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 def login(app_name):
     status, d = post('/local/oauth/device_authorization', {'client_name': app_name})
     if status != 200:
         sys.exit('error: ' + d.get('error_description', str(status)))
     save(PENDING, {**d, 'started_at': time.time()})
-    opened = webbrowser.open(d['verification_uri_complete'])
+    opened = open_browser(d['verification_uri_complete'])
     print(json.dumps({'browser_opened': opened, 'link': d['verification_uri_complete'], 'code': d['user_code']}))
 
 
@@ -305,6 +323,8 @@ def token():
     if not c.get('refresh_token'):
         sys.exit('login_needed')
     status, t = post('/local/oauth/token', {'grant_type': 'refresh_token', 'refresh_token': c['refresh_token'], 'client_id': c['client_id']})
+    if status == 0 or status >= 500:
+        sys.exit('error: could not reach Dr.Tail Local, try again')
     if status != 200:
         sys.exit('login_needed')
     keep(t, c['client_id'], c['refresh_token'])
