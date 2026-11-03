@@ -1,0 +1,17 @@
+name: Skill sync
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Served skill matches skill/SKILL.md
+        run: ./scripts/check-skill-sync.sh

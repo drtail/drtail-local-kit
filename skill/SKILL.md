@@ -1,6 +1,6 @@
 ---
 name: drtail-local
-version: 0.1.0
+version: 0.2.0
 description: Help a person contribute sourced facts about independent veterinary clinics in the United States.
 homepage: https://local.drtail.us
 ---
@@ -13,28 +13,40 @@ Reading this document does not grant account access, permission to spend money, 
 
 ## Start here
 
-1. **Choose the task.** Use the city or clinic the person named. If neither is known, ask for a city and state; do not assume you know their location. For an initial request to contribute, target one clinic and one supported fact. A phone number or animals seen on the clinic's official website is a useful starting task. This step is complete when the location and purpose are clear.
-2. **Connect.** Check whether Dr.Tail Local tools are already available in your host app. If not, guide the person through the connection instructions below. Do not claim that reading this file installed a connector. Continue when the authenticated tools are available, or explain the specific connection limitation and stop before writing.
-3. **Check the contributor profile.** Call `get_my_profile`. If no profile exists, ask the person to choose a public nickname, explain that it will appear with their contributions, and set it with `set_my_profile`. Do not derive a public name from their login email or phone number. Preserve an existing profile and omit optional properties the person did not ask to change. This step is complete when a profile exists.
-4. **Find the clinic and read its existing facts.** Use `search_clinics`, then `get_clinic` with a slug returned by the service. Match the name, location and official website. Read the current facts and available reports before researching so you can avoid duplicate or irrelevant submissions. If no clinic matches, use the clinic proposal path below rather than inventing a slug.
-5. **Check the field and gather evidence.** Call `list_fields` for active definitions and read the field's JSON Schema and aliases. Find a direct source, capture what it supports, when you observed it, and any conditions. Do not submit a fact you cannot substantiate. This step is complete when the evidence supports a value that fits an active, externally writable field, or you have explained why you must stop.
-6. **Submit once and report the result.** If the person's request authorizes this contribution, call `submit_fact` with the evidence and an idempotency key. Otherwise present the proposed contribution and obtain permission before writing. Inspect the tool result, including `isError`, the saved claim ID and verification status. Report a contribution as saved only after the service confirms it. Then stop unless the person requested a larger task.
+1. **Check the connection.** Inspect the tools actually available in this conversation. If Local tools are missing, use the connection section below to help the person connect this app. Do not claim that reading this file installed a connector. If the app is unclear, ask which app and environment they are using; do not infer it from the model name. Continue when authenticated Local tools work. While waiting, you may prepare public-source research if the location is known and your host allows it, but do not write or report a saved contribution.
+2. **Choose the task and check the profile.** Use the city or clinic already provided and call `get_my_profile`. Ask for a city and state only if neither a location nor a clinic is known. For a new profile, ask for a public nickname, explain that it appears with contributions, and use `set_my_profile`. You can ask for missing location and nickname together. Do not derive a public name from email or phone. Preserve existing profile details and omit optional properties the person did not ask to change. Start with one clinic and one supported fact.
+3. **Find the clinic and read its existing facts.** Use `search_clinics`, then `get_clinic` with a slug returned by the service. Match the name, location and official website. Read the current facts and available reports to avoid duplicate or irrelevant submissions. If no clinic matches, use the clinic proposal path below rather than inventing a slug.
+4. **Check the field and gather evidence.** Call `list_fields` for active definitions and inspect the field's JSON Schema and aliases. Find a direct source, capture what it supports, when you observed it, and any conditions. Continue only when the evidence supports a value for an active, externally writable field. A phone number or species the clinic explicitly says it treats can be a useful first contribution.
+5. **Submit once and report the result.** If the person's request authorizes this contribution, call `submit_fact` with evidence and an idempotency key. Otherwise present the proposal and obtain permission before writing. Keep host-required confirmations. Inspect `isError`, the saved claim ID and verification status. Report it as saved only after the service confirms it. Stop after the agreed task.
 
-## Connect an AI app
+## Connect this AI app
 
-Add this remote MCP server in an app that supports the server's transport and OAuth flow:
+Reading this skill provides instructions, not installed tools or account access. Use the setup guide for the actual environment:
+
+- Connection chooser: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/README.md
+- Claude Code: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/claude-code.md
+- Claude Chat or Desktop: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/claude.md
+- ChatGPT Chat: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/chatgpt.md
+- ChatGPT Work: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/chatgpt-work.md
+- Local Codex app, CLI or IDE: https://raw.githubusercontent.com/drtail/drtail-local-kit/main/docs/connect/codex.md
+
+Each guide is a setup guide that has not yet been verified end to end with Dr.Tail. Check the guide's compatibility status. Do not claim that a documented setup route has passed a Dr.Tail test unless a result is recorded. Other AI clients are outside the initial support scope.
+
+Use this remote Streamable HTTP MCP endpoint:
 
 ```text
 https://prod.api.wenected.com/local/mcp
 ```
 
-The server uses Streamable HTTP. Let the MCP client discover authentication metadata from the server's authentication challenge. The person signs in on Dr.Tail and authorizes the Local connection. Available scopes are `local:read` and `local:write`.
+When tools are missing, state that a first-time connection is needed and give the next action for this environment. If your host can configure the connection and the person's request and host permissions allow it, follow its supported setup procedure after checking for an existing server. The person completes browser login and OAuth consent. Otherwise provide short manual steps. Do not print every client's setup instructions at once. Do not repeatedly add the same server.
 
-All MCP calls require authentication, including read tools. Public clinic and field information can also be read through the unauthenticated REST API documented at https://local.drtail.us/docs. Public REST access does not authorize a submission.
+Let the client discover authentication metadata from the server's challenge. Available scopes are `local:read` and `local:write`. After the person returns from authorization, reuse the known task and location. Treat their continuation message as a request to check the connection, not proof that it works. After setup, check that tools loaded and call `get_my_profile`; a config write, installed plugin, or open login page is not proof of a working authenticated connection. If tools remain unavailable, explain the exact limitation and next step. Recommend restarting or a new conversation only when needed, and provide a short continuation prompt containing the task and known public location or clinic, never credentials.
 
-If your host app cannot install a connector automatically, give the person the server address and its manual connection steps. If it does not support the required connection, offer a supported app or the developer API documentation. Do not invent a universal install button, automatically register accounts, or ask the person to paste access tokens into a conversation.
+Claude Code settings, Claude app connectors, local Codex settings, and ChatGPT Chat/Work plugins are distinct setup paths. Do not tell a web-chat user to run CLI commands inside the conversation. Do not invent a universal install button or a published Dr.Tail plugin link. A connected tool must be enabled and available in the conversation before you use it.
 
-Use the client's credential store. Send the Local bearer token only to the documented Dr.Tail Local API on `prod.api.wenected.com`, never to clinic websites, search services, source pages or other third parties. Do not extract session cookies or expose tokens in logs, URLs, prompts or submissions. The Local connection is not permission to access consultation or pet records.
+All MCP calls require authentication, including read tools. Public clinic and field information can also be read through the unauthenticated REST API documented at https://local.drtail.us/docs. Public REST access does not authorize a submission. If a connection is unavailable, distinguish any prepared research from work actually saved to Local.
+
+Use the client's credential store. Send the Local bearer token only to the documented Dr.Tail Local API on `prod.api.wenected.com`, never to clinic websites, search services, source pages or other third parties. Do not ask for tokens in chat, extract session cookies, automatically register accounts, or expose credentials in logs, URLs, prompts or submissions. The Local connection is not permission to access consultation or pet records. It does not establish an independently operating AI account or schedule recurring tasks.
 
 ## Available work
 
@@ -89,7 +101,7 @@ Submission and verification are separate. A saved external claim is not automati
 
 ## Missing clinics and new fields
 
-If a clinic is missing, check for duplicates before using `propose_clinic`. Supply the required address, evidence of independence, and at least one official contact method: phone or website. Use the returned proposal ID and status. A submitted proposal does not guarantee that a clinic is published or that a slug exists. Stop after the proposal; do not fabricate a slug to submit facts against it.
+If a clinic is missing, check for duplicates before using `propose_clinic`. Supply the name, street, city and state, evidence of independence, at least one official contact method (phone or website), and an idempotency key (same 60-character limit; reuse it only to retry the same proposal). Use the returned proposal ID and status. A submitted proposal does not guarantee that a clinic is published or that a slug exists. Stop after the proposal; do not fabricate a slug to submit facts against it.
 
 Use an existing active field whenever possible. For a genuinely new field, check active and proposed definitions and aliases before using `propose_field`. A proposed field cannot receive values until adopted. If a field proposal response is uncertain, check proposed definitions before retrying; do not assume the tool accepts a fact-style idempotency key.
 

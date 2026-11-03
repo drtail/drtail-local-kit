@@ -5,19 +5,24 @@ People and their AI apps can read it and add to it. The Dr.Tail research team ch
 
 - Site: https://local.drtail.us
 - MCP server: `https://prod.api.wenected.com/local/mcp`
-- Agent guide: https://local.drtail.us/skill.md (the same text as `skill/SKILL.md`)
+- Agent guide: https://local.drtail.us/skill.md, served from `skill/SKILL.md` in this repository (the source). `scripts/check-skill-sync.sh` checks that the two match; the Skill sync workflow runs it daily and on every push.
 
 This repository holds documentation, a contribution skill for AI apps, and examples.
 It does not contain Dr.Tail's application code or clinic data.
 
 ## Connect an AI app
 
-1. In an AI app that supports remote MCP servers with sign-in, add a custom connector with the MCP server address.
-2. The app opens a Dr.Tail page. Sign in with your Dr.Tail account and allow access to Dr.Tail Local.
-   The connection can read Local data and add to it (`local:read`, `local:write`). It cannot see consultations, pets or account details.
-3. Set a public contributor name (`set_my_profile`), then ask the app to find a clinic and submit one fact.
+Pick the guide for the app you use. Each one is a **setup guide that has not yet been verified end to end** with Dr.Tail.
 
-You can remove a connected app any time at https://local.drtail.us/account.
+| App | Guide |
+|---|---|
+| Claude Code | [docs/connect/claude-code.md](docs/connect/claude-code.md) |
+| Claude Chat / Desktop | [docs/connect/claude.md](docs/connect/claude.md) |
+| ChatGPT Chat | [docs/connect/chatgpt.md](docs/connect/chatgpt.md) |
+| ChatGPT Work | [docs/connect/chatgpt-work.md](docs/connect/chatgpt-work.md) |
+| Local Codex app / CLI / IDE | [docs/connect/codex.md](docs/connect/codex.md) |
+
+In every app the shape is the same: add the MCP server address, sign in on the Dr.Tail page that opens and approve Local access (`local:read`, `local:write`), then ask your AI to check the connection with `get_my_profile`. The connection cannot see consultations, pets or account details. You can remove a connected app any time at https://local.drtail.us/account.
 
 Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC 8414), dynamic client registration (RFC 7591), PKCE S256, tokens bound to the MCP server.
 
@@ -41,12 +46,12 @@ Sign-in is OAuth 2.1: discovery from the server's 401 response (RFC 9728 and RFC
 - New reports show as reported, not yet verified, and never replace a fact the Dr.Tail team verified.
 - Retries with the same `idempotency_key` return the first submission.
 
-See `skill/SKILL.md` for the step-by-step guide and `examples/` for API calls.
+See `skill/SKILL.md` for the step-by-step guide, `docs/connect/` for app setup, `examples/` for API calls and [CONTRIBUTING.md](CONTRIBUTING.md) to improve a guide or report a connection problem.
 
 ## License
 
 - Code and examples: MIT (see `LICENSE`).
-- Documentation and the skill text: CC BY 4.0 (see `LICENSE-docs`).
+- Documentation (README, CONTRIBUTING, `docs/`) and the skill text: CC BY 4.0 (see `LICENSE-docs`).
 - Dr.Tail Local data is not part of this repository. Using the data is governed by Dr.Tail's terms.
 
 ## Contact
