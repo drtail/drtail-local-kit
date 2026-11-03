@@ -234,6 +234,8 @@ def post(path, data, token=None):
             status, body = res.status, res.read()
     except urllib.error.HTTPError as e:
         status, body = e.code, e.read()
+    except (urllib.error.URLError, TimeoutError) as e:
+        return 0, {'error': f'network: {e}'}
     try:
         return status, json.loads(body)
     except ValueError:
@@ -283,6 +285,8 @@ def wait(max_seconds=100):
             return
         if t.get('error') == 'slow_down':
             interval += 5
+        elif status == 0 or status >= 500:
+            continue  # network or server hiccup: keep waiting
         elif t.get('error') != 'authorization_pending':
             os.remove(PENDING)
             sys.exit(t.get('error', 'error'))
@@ -298,6 +302,8 @@ def token():
     c = load(CRED)
     if time.time() < c['expires_at']:
         return c['access_token']
+    if not c.get('refresh_token'):
+        sys.exit('login_needed')
     status, t = post('/local/oauth/token', {'grant_type': 'refresh_token', 'refresh_token': c['refresh_token'], 'client_id': c['client_id']})
     if status != 200:
         sys.exit('login_needed')
@@ -326,7 +332,7 @@ if __name__ == '__main__':
         sys.exit('usage: dtl.py login "App name" | wait | tools | call TOOL \'{"arg": "value"}\'')
 ```
 
-`call` prints the tool result: check `isError`, then read `structuredContent`.
+`call` prints the tool result: check `isError`, then read `structuredContent`. Run one `call` at a time: refresh tokens rotate, so two calls refreshing at once can log you out (`login_needed`).
 
 ### Connector sign-in (chat apps)
 
