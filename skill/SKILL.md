@@ -43,8 +43,8 @@ If tools like `get_my_profile` and `search_clinics` from Dr.Tail Local are loade
 
 Use **device login**. It works right now in this session: no MCP setup, no restart, nothing for the person to copy.
 
-1. **Reuse a saved login.** If `~/.config/drtail-local/credentials.json` exists, run `python3 ~/.config/drtail-local/dtl.py call get_my_profile`. If it works, go to Step 1. If it prints `login_needed`, continue below.
-2. **Save the helper** (once). Write the [helper script](#device-login-helper) to `~/.config/drtail-local/dtl.py`. If the file already exists and its first lines say `0.3.0` or newer, keep it.
+1. **Reuse a saved login.** If `~/.config/drtail-local/credentials.json` exists, save the helper (next step), then run `python3 ~/.config/drtail-local/dtl.py call get_my_profile`. If it works, go to Step 1. If it prints `login_needed`, continue below.
+2. **Save the helper.** Write the [helper script](#device-login-helper) from this file to `~/.config/drtail-local/dtl.py`, replacing any older copy. Don't run a copy you didn't write from this file.
 3. **Start sign-in** with your app's real name:
 
    ```bash
@@ -231,15 +231,20 @@ def post(path, data, token=None):
     req = urllib.request.Request(API + path, json.dumps(data).encode(), headers)
     try:
         with urllib.request.urlopen(req, timeout=30) as res:
-            return res.status, json.load(res)
+            status, body = res.status, res.read()
     except urllib.error.HTTPError as e:
-        body = e.read()
-        return e.code, json.loads(body) if body.strip().startswith(b'{') else {}
+        status, body = e.code, e.read()
+    try:
+        return status, json.loads(body)
+    except ValueError:
+        return status, {'error': f'HTTP {status}, not JSON'}
 
 
 def save(path, data):
     os.makedirs(DIR, mode=0o700, exist_ok=True)
-    with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), 'w') as f:
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    os.fchmod(fd, 0o600)
+    with os.fdopen(fd, 'w') as f:
         json.dump(data, f)
 
 
@@ -248,9 +253,10 @@ def load(path):
         return json.load(f)
 
 
-def keep(tokens, client_id):
+def keep(tokens, client_id, old_refresh=None):
     save(CRED, {'client_id': client_id, 'access_token': tokens['access_token'],
-                'refresh_token': tokens['refresh_token'], 'expires_at': time.time() + tokens['expires_in'] - 60})
+                'refresh_token': tokens.get('refresh_token', old_refresh),
+                'expires_at': time.time() + tokens['expires_in'] - 60})
 
 
 def login(app_name):
@@ -295,7 +301,7 @@ def token():
     status, t = post('/local/oauth/token', {'grant_type': 'refresh_token', 'refresh_token': c['refresh_token'], 'client_id': c['client_id']})
     if status != 200:
         sys.exit('login_needed')
-    keep(t, c['client_id'])
+    keep(t, c['client_id'], c['refresh_token'])
     return t['access_token']
 
 
