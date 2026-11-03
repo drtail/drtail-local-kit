@@ -1,6 +1,6 @@
 #!/bin/sh
 # Submit one fact with a Dr.Tail Local access token (from your app's OAuth connection).
-# Usage: TOKEN=dtl_at_... API=https://dev-1.api.wenected.com ./submit_fact.sh
+# Usage: TOKEN=dtl_at_... API=https://prod.api.wenected.com ./submit_fact.sh
 set -eu
 curl -sS -X POST "$API/local/claims/" \
   -H "Authorization: Bearer $TOKEN" \
